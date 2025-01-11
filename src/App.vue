@@ -33,7 +33,7 @@ export default {
     // Requête pour récupérer la liste des clients
     axios.get('http://localhost:8080/clients')
       .then(response => {
-        this.clients = response.data._emls -ltrhabedded.clientSummaryDTOList;
+        this.clients = response.data._embedded.clientSummaryDTOList;
       })
       .catch(error => {
         console.error("Erreur lors de la récupération des clients:", error);
