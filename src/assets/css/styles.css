@@ -1,0 +1,125 @@
+/* styles.css */
+
+/* Appliquer une police moderne et élégante */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Corps de la page */
+body {
+    background-color: #f7f9fc;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Titre principal de la page */
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 2.2em;
+    margin-bottom: 30px;
+}
+
+/* Conteneur pour la liste des clients */
+.client-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* Style pour chaque carte de client */
+.client-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 250px;
+}
+
+/* Animation au survol des cartes */
+.client-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Titre du client */
+.client-card h2 {
+    font-size: 1.5em;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Description du client */
+.client-card p {
+    color: #7f8c8d;
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+/* Bouton d'action sur chaque client */
+.client-card button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 6px;
+    margin-top: auto;
+    transition: background-color 0.3s;
+}
+
+/* Effet au survol du bouton */
+.client-card button:hover {
+    background-color: #2980b9;
+}
+
+/* Style de la section des détails du client */
+#client-detail {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin-top: 30px;
+}
+
+/* Détails du client */
+#client-detail h2 {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+/* Paragraphe pour les informations détaillées */
+#client-detail p {
+    color: #7f8c8d;
+    font-size: 1.2em;
+    margin-bottom: 12px;
+}
+
+/* Mettez en forme les liens */
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

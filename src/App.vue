@@ -1,26 +1,55 @@
+<style scoped src="@/assets/css/styles.css"></style>
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1>Liste des Clients</h1>
+    <ul>
+      <li v-for="client in clients" :key="client.id">
+        <a href="#" @click="getClientDetails(client.id)">{{ client.name }}</a>
+      </li>
+    </ul>
+
+    <!-- Section pour afficher les détails du client -->
+    <div v-if="clientDetails">
+      <h2>Détails du Client</h2>
+      <p><strong>Nom:</strong> {{ clientDetails.name }}</p>
+      <p><strong>Domain:</strong> {{ clientDetails.domain }}</p>
+      <p><strong>Twitter:</strong> {{ clientDetails.twitterUsername }}</p>
+      <p><strong>Followers:</strong> {{ clientDetails.followersCount }}</p>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios';
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      clients: [],           // Liste des clients
+      clientDetails: null    // Détails du client
+    };
+  },
+  mounted() {
+    // Requête pour récupérer la liste des clients
+    axios.get('http://localhost:8080/clients')
+      .then(response => {
+        this.clients = response.data._emls -ltrhabedded.clientSummaryDTOList;
+      })
+      .catch(error => {
+        console.error("Erreur lors de la récupération des clients:", error);
+      });
+  },
+  methods: {
+    // Méthode pour récupérer les détails d'un client
+    getClientDetails(clientId) {
+      axios.get(`http://localhost:8080/clients/${clientId}`)
+        .then(response => {
+          this.clientDetails = response.data;  // Assigne les détails du client à `clientDetails`
+        })
+        .catch(error => {
+          console.error("Erreur lors de la récupération des détails du client:", error);
+        });
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
