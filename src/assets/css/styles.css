@@ -1,6 +1,6 @@
 /* styles.css */
 
-/* Appliquer une police moderne et élégante */
+/* police */
 * {
     margin: 0;
     padding: 0;
@@ -38,7 +38,7 @@ h1 {
     width: 100%;
 }
 
-/* Style pour chaque carte de client */
+/* Style pour chaque client */
 .client-card {
     background-color: #fff;
     border-radius: 12px;
@@ -51,7 +51,7 @@ h1 {
     height: 250px;
 }
 
-/* Animation au survol des cartes */
+/* Animation au survol des clients */
 .client-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -114,7 +114,7 @@ h1 {
     margin-bottom: 12px;
 }
 
-/* Mettez en forme les liens */
+/* liens */
 a {
     color: #3498db;
     text-decoration: none;
