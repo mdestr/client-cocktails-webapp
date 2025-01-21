@@ -3,18 +3,38 @@
     <h1>Liste des Clients</h1>
     <ul>
       <li v-for="client in clients" :key="client.id">
-        <!-- Nom du client avec un lien pour afficher/masquer les détails -->
-        <a href="#" @click.prevent="toggleClientDetails(client)">
+        <a href="#" @click.prevent="toggleDetails(client.id)">
           {{ client.name }}
         </a>
 
-        <!-- Section pour afficher les détails du client -->
-        <div v-if="client.showDetails" class="client-details">
-          <p><strong>Nom:</strong> {{ client.details?.name || "Chargement..." }}</p>
-          <p><strong>Nom traduit :</strong> {{ client.details?.translatedName || "Chargement..." }}</p>
-          <p><strong>Domain:</strong> {{ client.details?.domain || "Chargement..." }}</p>
-          <p><strong>Twitter:</strong> {{ client.details?.twitterUsername || "Chargement..." }}</p>
-          <p><strong>Followers:</strong> {{ client.details?.followersCount || "Chargement..." }}</p>
+        <!-- Affichage des détails du client juste sous l'élément concerné -->
+        <div v-if="selectedClientId === client.id && clientDetails">
+          <h3>Détails du Client</h3>
+          <p><strong>Nom:</strong> {{ clientDetails.name }}</p>
+          <p><strong>Domain:</strong> {{ clientDetails.domain }}</p>
+          <p><strong>Twitter:</strong> {{ clientDetails.twitterUsername }}</p>
+          <p><strong>Followers:</strong> {{ clientDetails.followersCount }}</p>
+
+          <!-- Liste des cocktails -->
+          <h4>Cocktails</h4>
+          <ul>
+            <li v-for="cocktail in cocktails" :key="cocktail.id">
+              <a href="#" @click.prevent="getCocktailDetails(cocktail.id)">
+                {{ cocktail.name }}
+              </a>
+            </li>
+          </ul>
+
+          <!-- Détails du cocktail -->
+          <div v-if="selectedCocktailId === cocktailDetails?.id">
+            <h4>Détails du Cocktail</h4>
+            <p><strong>Nom:</strong> {{ cocktailDetails.name }}</p>
+            <p><strong>Catégorie:</strong> {{ cocktailDetails.category }}</p>
+            <p><strong>Alcoolique:</strong> {{ cocktailDetails.alcoholic }}</p>
+            <p><strong>Verre:</strong> {{ cocktailDetails.glassType }}</p>
+            <p><strong>Instructions:</strong> {{ cocktailDetails.instructions }}</p>
+            <p><strong>Ingrédients:</strong> {{ cocktailDetails.ingredients }}</p>
+          </div>
         </div>
       </li>
     </ul>
@@ -27,60 +47,112 @@ import axios from "axios";
 export default {
   data() {
     return {
-      clients: [], // Liste des clients avec showDetails et details
+      clients: [],
+      clientDetails: null,
+      cocktails: [],
+      cocktailDetails: null,
+      selectedClientId: null,
+      selectedCocktailId: null,
     };
   },
   mounted() {
-    // Requête pour récupérer la liste des clients
+    // Charger la liste des clients
     axios
       .get("http://localhost:8080/clients")
       .then((response) => {
-        // Initialise les clients avec une propriété `showDetails` et un espace pour les détails
-        this.clients = response.data._embedded.clientSummaryDTOList.map((client) => ({
-          ...client,
-          showDetails: false, // Par défaut, les détails ne sont pas affichés
-          details: null, // Espace pour stocker les détails
-        }));
+        this.clients = response.data._embedded.clientSummaryDTOList;
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des clients:", error);
       });
   },
   methods: {
-    // Méthode pour afficher/masquer les détails d'un client
-    toggleClientDetails(client) {
-      // Si les détails sont déjà visibles, on les masque
-      if (client.showDetails) {
-        client.showDetails = false;
-        return;
+    toggleDetails(clientId) {
+      if (this.selectedClientId === clientId) {
+        // Si déjà sélectionné, on referme les détails
+        this.selectedClientId = null;
+        this.clientDetails = null;
+        this.cocktails = [];
+        this.resetCocktailDetails();
+      } else {
+        // Charger les détails d'un nouveau client
+        this.selectedClientId = clientId;
+        this.resetCocktailDetails();
+        this.getClientDetails(clientId);
       }
+    },
+    getClientDetails(clientId) {
+      axios
+        .get(`http://localhost:8080/clients/${clientId}`)
+        .then((response) => {
+          this.clientDetails = response.data;
 
-      // Sinon, on les affiche et récupère les données si elles ne sont pas déjà chargées
-      client.showDetails = true;
+          // Charger la liste des cocktails du client
+          const cocktailLinks = Object.values(response.data._links).filter(
+            (link) => link.href.includes("/cocktails/")
+          );
 
-      if (!client.details) {
-        axios
-          .get(`http://localhost:8080/clients/${client.id}`)
-          .then((response) => {
-            client.details = response.data; // Ajoute les détails au client
-          })
-          .catch((error) => {
-            console.error("Erreur lors de la récupération des détails du client:", error);
-          });
-      }
+          if (cocktailLinks.length > 0) {
+            this.getCocktails(cocktailLinks);
+          } else {
+            this.cocktails = [];
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des détails du client:", error);
+        });
+    },
+    getCocktails(links) {
+      // Charger tous les cocktails à partir des liens
+      const cocktailRequests = links.map((link) =>
+        axios.get(link.href).then((response) => response.data)
+      );
+
+      Promise.all(cocktailRequests)
+        .then((cocktailResponses) => {
+          this.cocktails = cocktailResponses;
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des cocktails:", error);
+        });
+    },
+    getCocktailDetails(cocktailId) {
+      axios
+        .get(`http://localhost:8080/cocktails/${cocktailId}`)
+        .then((response) => {
+          this.selectedCocktailId = cocktailId;
+          this.cocktailDetails = response.data;
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des détails du cocktail:", error);
+        });
+    },
+    resetCocktailDetails() {
+      // Réinitialiser les détails des cocktails
+      this.selectedCocktailId = null;
+      this.cocktailDetails = null;
     },
   },
 };
 </script>
 
 <style scoped>
-/* Style pour différencier les détails */
-.client-details {
+a {
+  text-decoration: none;
+  color: #007bff;
+  cursor: pointer;
+}
+a:hover {
+  text-decoration: underline;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  margin-bottom: 15px;
+}
+div {
   margin-left: 20px;
-  padding: 10px;
-  border-left: 2px solid #ccc;
-  color: #333;
-  background-color: #f9f9f9;
-  border-radius: 5px;
 }
 </style>
