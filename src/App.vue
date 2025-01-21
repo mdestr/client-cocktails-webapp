@@ -11,6 +11,7 @@
         <div v-if="selectedClientId === client.id && clientDetails">
           <h3>Détails du Client</h3>
           <p><strong>Nom:</strong> {{ clientDetails.name }}</p>
+          <p><strong>Nom traduit:</strong> {{ clientDetails.translatedName }}</p>
           <p><strong>Domain:</strong> {{ clientDetails.domain }}</p>
           <p><strong>Twitter:</strong> {{ clientDetails.twitterUsername }}</p>
           <p><strong>Followers:</strong> {{ clientDetails.followersCount }}</p>
