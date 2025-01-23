@@ -6,8 +6,15 @@
         <a href="#" @click.prevent="toggleDetails(client.id)">
           {{ client.name }}
         </a>
+        <!-- Ajouter une icône cocktail si le client a des cocktails -->
+        <img
+          v-if="client.hasCocktails"
+          src="./assets/cocktail_882673.png"
+          alt="Cocktail Icon"
+          style="width: 16px; height: 16px; margin-left: 5px;"
+        />
 
-        <!-- Affichage des détails du client juste sous l'élément concerné -->
+        <!-- Affichage des détails du client -->
         <div v-if="selectedClientId === client.id && clientDetails">
           <h3>Détails du Client</h3>
           <p><strong>Nom:</strong> {{ clientDetails.name }}</p>
@@ -32,7 +39,7 @@
             <h4>Détails du Cocktail</h4>
             <p><strong>Nom:</strong> {{ cocktailDetails.name }}</p>
             <p><strong>Catégorie:</strong> {{ cocktailDetails.category }}</p>
-            <p><strong>Alcoolique:</strong> {{ cocktailDetails.alcoholic }}</p>
+            <p><strong>Alcoolisé:</strong> {{ cocktailDetails.alcoholic }}</p>
             <p><strong>Verre:</strong> {{ cocktailDetails.glassType }}</p>
             <p><strong>Instructions:</strong> {{ cocktailDetails.instructions }}</p>
             <p><strong>Ingrédients:</strong> {{ cocktailDetails.ingredients }}</p>
@@ -58,11 +65,27 @@ export default {
     };
   },
   mounted() {
-    // Charger la liste des clients
+    // Charger la liste des clients avec vérification des cocktails
     axios
       .get("http://localhost:8080/clients")
       .then((response) => {
-        this.clients = response.data._embedded.clientSummaryDTOList;
+        const clients = response.data._embedded.clientSummaryDTOList;
+
+        // Vérifier si chaque client a des cocktails
+        const clientPromises = clients.map((client) => {
+          return axios
+            .get(client._links.self.href)
+            .then((detailResponse) => {
+              const hasCocktails = Object.keys(detailResponse.data._links).some((key) =>
+                key.startsWith("cocktail-")
+              );
+              return { ...client, hasCocktails };
+            });
+        });
+
+        Promise.all(clientPromises).then((clientsWithCocktails) => {
+          this.clients = clientsWithCocktails;
+        });
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des clients:", error);
@@ -137,24 +160,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-a {
-  text-decoration: none;
-  color: #007bff;
-  cursor: pointer;
-}
-a:hover {
-  text-decoration: underline;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  margin-bottom: 15px;
-}
-div {
-  margin-left: 20px;
-}
-</style>
