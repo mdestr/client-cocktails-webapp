@@ -11,7 +11,7 @@
           v-if="client.hasCocktails"
           src="./assets/cocktail_882673.png"
           alt="Cocktail Icon"
-          style="width: 16px; height: 16px; margin-left: 5px;"
+          style="width: 24px; height: 24px; margin-left: 5px;"
         />
 
         <!-- Affichage des détails du client -->
